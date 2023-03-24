@@ -1,0 +1,49 @@
+version: '2.0'
+
+networks:
+  guacnetwork:
+    driver: bridge
+
+services:
+  guacd:
+    container_name: guacd
+    image: cr.lanave.io/guacamole/guacd
+    networks:
+      guacnetwork:
+    restart: unless-stopped
+    volumes:
+    - /home/docker/docker/guacamole/drive:/drive:rw
+    - /home/docker/docker/guacamole/record:/record:rw
+  postgres:
+    container_name: postgres_guacamole
+    environment:
+      PGDATA: /var/lib/postgresql/data/guacamole
+      POSTGRES_DB: guacamole_db
+      POSTGRES_PASSWORD: 'ChooseYourOwnPasswordHere1234'
+      POSTGRES_USER: guacamole_user
+    image: docker.uclv.cu/postgres:12-alpine
+    networks:
+      guacnetwork:
+    restart: always   
+    volumes:
+    - /home/docker/docker/guacamole/init:/docker-entrypoint-initdb.d:z
+    - /home/docker/docker/guacamole/data:/var/lib/postgresql/data:Z
+  guacamole:
+    container_name: guacamole_compose
+    depends_on:
+    - guacd
+    - postgres
+    environment:
+      GUACD_HOSTNAME: guacd
+      POSTGRES_DATABASE: guacamole_db
+      POSTGRES_HOSTNAME: postgres
+      POSTGRES_PASSWORD: 'ChooseYourOwnPasswordHere1234'
+      POSTGRES_USER: guacamole_user
+    image: docker.uclv.cu/guacamole/guacamole
+    links:
+    - guacd
+    networks:
+      guacnetwork:
+    ports:
+    - 8025:8080/tcp
+    restart: unless-stopped
