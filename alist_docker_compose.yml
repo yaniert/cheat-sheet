@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+    alist:         
+        restart: unless-stopped
+        volumes:
+            - /home/docker/docker/alist:/opt/alist/data
+        ports:
+            - 3024:5244
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - UMASK=022
+        container_name: alist
+        image: cr.lanave.io/xhofe/alist:latest
