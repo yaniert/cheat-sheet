@@ -1,0 +1,14 @@
+version: "2"
+services:
+  vault:
+    image: cr.lanave.io/vaultwarden/server:latest
+    container_name: vault
+    restart: unless-stopped   
+    volumes:
+      - /home/docker/docker/vw-data:/data
+    ports:
+      - 8070:80
+      - 3012:3012
+    environment:
+      - WEBSOCKET_ENABLED=true
+      - DOMAIN=http://contraseña.com.cu
